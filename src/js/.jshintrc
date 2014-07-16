@@ -1,0 +1,21 @@
+// See http://jshint.com/docs/options/ for config options
+{
+    "curly": true,
+    "eqeqeq": true,
+    "immed": true,
+    "latedef": true,
+    "newcap": true,
+    "noarg": true,
+    "sub": true,
+    "undef": true,
+    "unused": true,
+    "boss": true,
+    "browser": true,
+    "globals": {
+    /*
+      "jQuery": true,
+      "$": true,
+    */
+      "console": true
+    }
+}
