@@ -27,7 +27,7 @@ Placing any PNG, GIF, JPG, or SVG files into `images/_uncompressed` will create 
 
 #####**Examples**
 
-* `images/_uncompressed/images.png` --> `images/images.png`
+* `images/_uncompressed/image.png` --> `images/image.png`
 * `images/_uncompressed/directory/image.png` --> `images/directory/image.png`
 
 
@@ -35,5 +35,5 @@ Placing any PNG, GIF, JPG, or SVG files into `images/_uncompressed` will create 
 
 CSSMin/CSS-clean currently [strips out CSS sourcemap link comment](https://github.com/GoalSmashers/clean-css/issues/125#issuecomment-40404184) which can make debugging a little more difficult. Link to unminified version while in development, and then change link for production builds.
 
-#### Linting/Concatenating/Minifying JS
+#### ***Linting/Concatenating/Minifying JS***
 All files in `lib` folder are not part of the JS processing.

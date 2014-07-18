@@ -1,2 +1,2 @@
-// src/js/scripts.js
+// File: src/js/scripts.js
 
