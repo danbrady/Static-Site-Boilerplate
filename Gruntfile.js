@@ -12,7 +12,8 @@ module.exports = function(grunt) {
         config: {
             srcDir : 'src',
             buildDir: 'build',
-            uncompressedDir: 'src/images/_uncompressed'
+            uncompressedDir: 'images-uncompressed',
+            generateJsSourcemaps: false
         },
 
         jshint: {
@@ -25,11 +26,11 @@ module.exports = function(grunt) {
             scripts: {
                 files: [{
                     expand: true,
-                    cwd: '<%= config.srcDir %>',
+                    cwd: '<%= config.srcDir %>/js/',
                     src: [
-                        'js/**/*.js',
-                        '!js/lib/**/*', // Ignore 'lib' files
-                        '!js/*.{min,concat}.js' // Ignore any concatenated files (from previous processing)
+                        '**/*.js',
+                        '!lib/**/*', // Ignore 'lib' files
+                        '!*.{min,concat}.js' // Ignore any concatenated files (from previous processing)
                     ]
                 }]
             }
@@ -43,18 +44,29 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: [
-                    '<%= config.srcDir %>/js/**/*.js',
-                    '!<%= config.srcDir %>/js/lib/**/*.js', // Ignore 'lib' files
-                    '!<%= config.srcDir %>/js/*.{min,concat}.js' // Ignore any minified/concatenated files (from previous processing)
+                    '<%= config.buildDir %>/js/**/*.js',
+                    '!<%= config.buildDir %>/js/lib/**/*.js', // Ignore 'lib' files
+                    '!<%= config.buildDir %>/js/*.{min,concat}.js' // Ignore any minified/concatenated files (from previous processing)
                 ],
-                dest: '<%= config.srcDir %>/js/script.concat.js'
+                dest: '<%= config.buildDir %>/js/scripts.concat.js'
             }
         },
 
         uglify: {
+            options: {
+                sourceMap: '<%= config.generateJsSourcemaps %>'
+            },
             build: {
-                src: '<%= config.srcDir %>/js/script.concat.js',
-                dest: '<%= config.srcDir %>/js/script.min.js'
+                expand: true,
+                flatten: true,
+                src: [
+                    '<%= config.srcDir %>/js/**/*.js',
+                    '!<%= config.srcDir %>/js/lib/**/*.js',
+                    '!<%= config.srcDir %>/Gruntfile.js',
+                    '<%= config.buildDir %>/js/scripts.concat.js'
+                ],
+                ext: '.min.js',
+                dest: '<%= config.buildDir %>/js/'
             }
         },
 
@@ -65,9 +77,9 @@ module.exports = function(grunt) {
             dynamic: {
                 files: [{
                     expand: true,
-                    cwd: '<%= config.uncompressedDir %>/',
+                    cwd: '<%= config.srcDir %>/<%= config.uncompressedDir %>',
                     src: ['**/*.{png,jpg,gif,svg}'],
-                    dest: '<%= config.srcDir %>/images/'
+                    dest: '<%= config.srcDir %>/images'
                 }]
             }
         },
@@ -78,7 +90,7 @@ module.exports = function(grunt) {
                 "box-sizing": false
             },
             src: [
-                '<%= config.srcDir %>/css/style.css'
+                '<%= config.buildDir %>/css/styles.css'
             ],
         },
 
@@ -86,11 +98,10 @@ module.exports = function(grunt) {
             dist: {
                 options: {
                     sourcemap: true,
-                    lineNumbers: true,
                     style: 'expanded' // nested, compact, compressed, expanded
                 },
                 files: {
-                    '<%= config.srcDir %>/css/style.css' : '<%= config.srcDir %>/sass/style.scss'
+                    '<%= config.srcDir %>/css/styles.css': '<%= config.srcDir %>/sass/main.scss'
                 }
             }
         },
@@ -98,22 +109,20 @@ module.exports = function(grunt) {
         autoprefixer: {
             options: {
                 map: true,
+                diff: true, // Creates .patch file
                 browsers: [
-                    // Support "borrowed" from Bootstrap
                     'Android 2.3',
                     'Android >= 4',
                     'Chrome >= 20',
-                    'Firefox >= 24', // Firefox 24 is the latest ESR
+                    'Firefox >= 24',
                     'Explorer >= 8',
                     'iOS >= 6',
-                    'Opera >= 12',
                     'Safari >= 6'
                 ]
             },
             dist: {
-                files: {
-                    '<%= config.srcDir %>/css/style.css': '<%= config.srcDir %>/css/style.css'
-                }
+                src: '<%= config.srcDir %>/css/styles.css',
+                dest: '<%= config.srcDir %>/css/styles.css'
             }
         },
 
@@ -133,13 +142,49 @@ module.exports = function(grunt) {
         },
 
         copy: {
-            main: {
+
+            js: {
                 expand: true,
                 cwd: '<%= config.srcDir %>',
-                src: ['**/*.html', '**/*.map'],
-                //src: ['images/**/*', 'js/**/*', 'css/**/*', 'json/**/*', '!**/backup/**'],
-                dest: '<%= config.buildDir %>/'
+                src: [
+                    'js/**/*.{js,map}',
+                    '!js/**/*.concat.js'
+
+                ],
+                dest: '<%= config.buildDir %>'
+            },
+
+            // Keep this separate to run 'newer' on
+            images: {
+                expand: true,
+                cwd: '<%= config.srcDir %>/images/',
+                src: [
+                    '**/*',
+                ],
+                dest: '<%= config.buildDir %>/images'
+            },
+
+            css: {
+                expand: true,
+                cwd: '<%= config.srcDir %>/css/',
+                src: [
+                    '*.{css,map}'
+                ],
+                dest: '<%= config.buildDir %>/css'
             }
+        },
+
+        includes: {
+            htmlDynamic: {
+                expand: true,
+                cwd: '<%= config.srcDir %>',
+                src: [
+                    '**/*.html',
+                    '!_includes/**/*'
+                ],
+                dest: '<%= config.buildDir %>'
+            }
+
         },
 
         clean: ['<%= config.buildDir %>'],
@@ -151,31 +196,42 @@ module.exports = function(grunt) {
 
             gruntfile: {
                 files: 'Gruntfile.js',
-                tasks: ['jshint:gruntfile']
+                tasks: ['jshint:gruntfile', 'build']
             },
 
             scripts: {
                 files: ['<%= config.srcDir %>/js/**/*.js'],
-                tasks: ['newer:jshint:scripts', 'newer:concat', 'newer:uglify']
+                tasks: ['newer:jshint:scripts', 'newer:copy:js', 'concat', 'newer:uglify']
             },
 
-            images: {
-                files: ['<%= config.uncompressedDir %>/**/*.{png,jpg,gif,svg}'],
+            imagesUncompressed: {
+                files: ['<%= config.srcDir %>/<%= config.uncompressedDir %>/**/*.{png,jpg,gif,svg}'],
                 tasks: ['newer:imagemin']
             },
 
-            sass: {
-                files: ['<%= config.srcDir %>/sass/*.scss'],
-                tasks: ['sass']
+            images: {
+                files: ['<%= config.srcDir %>/images/**/*.{png,jpg,gif,svg}'],
+                tasks: ['newer:copy:images']
             },
 
-            css: {
-                files: ['<%= config.srcDir %>/css/style.css'],
-                tasks: ['autoprefixer', 'csslint', 'cssmin']
+            sass: {
+                files: ['<%= config.srcDir %>/sass/**/*.scss'],
+                tasks: ['sass', 'autoprefixer', 'cssmin', 'copy:css']
+            },
+
+            // Need to recompile all HTMLs when an include changes
+            htmlDynamic: {
+                files: [
+                    '<%= config.srcDir %>/_includes/**/*.html'
+                ],
+                tasks: ['includes']
             },
 
             html: {
-                files: ['<%= config.srcDir %>/**/*.html']
+                files: [
+                    '<%= config.srcDir %>**/*.html'
+                ],
+                tasks: ['newer:includes']
             }
 
         }
@@ -183,5 +239,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('default', ['watch']);
+    grunt.registerTask('build', ['clean', 'jshint:scripts', 'copy:js', 'concat', 'uglify', 'sass', 'autoprefixer', 'cssmin', 'copy', 'includes']);
 
 };
