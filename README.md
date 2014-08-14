@@ -7,19 +7,26 @@ A Grunt-powered project to build up the scaffolding for static site assets.
 * Automatically compress PNG, GIF, JPG, and SVG files when added to folder
 * Automatic linting (via JSHint and CSSlint), concatenation, and minification of JS and CSS files
 * SASS and Autoprefixer integration
-* Browser auto-refresh on save (via Livereload plugin)
+* Browser auto-refresh on save (via LiveReload plugin)
+* Include HTML into other HTML files
 
 ##**Prerequisites**
 
 - [NodeJS](http://nodejs.org/) and NPM
 - Grunt CLI (`npm install -g grunt`)
-- [Livereload Plugins](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-) for Chrome, Firefox, and Safari (*Optional*)
+- [LiveReload Plugins](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-) for Chrome, Firefox, and Safari (*Optional*)
+
 
 ## Running
 1. Navigate to repo folder in terminal and run `npm install` (may need to `sudo npm install`)
 2. Run `grunt` to start watching `src` directory for changes
+3. Point your browser to the generated 'build' directory, but map your Chrome workspace to the `src` directory for in-browser editing. (Be sure to deactivate LiveReload first.)
 
 ## Notes
+
+#### *** Includes ***
+
+Place your HTML fragments that you might on use on multiple page (e.g. footer) into the `_includes` directory. To include it use `_includes/sample.html` in your HTML. A Grunt task with auto-recompile all the HTML files.
 
 #### ***Compressing Images***
 

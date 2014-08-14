@@ -1,7 +1,7 @@
 {
   "name": "Static-Site-Boilerplate",
-  "version": "0.0.1",
-  "description": "Grunt-powered scaffolding for starting a static web site. ",
+  "version": "0.1.0",
+  "description": "Grunt-powered scaffolding for building static site assets.",
   "author": "Dan Brady",
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -14,7 +14,10 @@
     "grunt-contrib-csslint": "^0.2.0",
     "load-grunt-tasks": "^0.6.0",
     "grunt-newer": "^0.7.0",
-    "grunt-autoprefixer": "^0.8.1",
-    "grunt-contrib-cssmin": "^0.10.0"
+    "grunt-autoprefixer": "^0.8.2",
+    "grunt-contrib-cssmin": "^0.10.0",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-includes": "^0.4.5"
   }
 }
