@@ -24,7 +24,7 @@ A Grunt-powered project to build up the scaffolding for static site assets.
 
 ## Notes
 
-#### *** Includes ***
+#### ***Includes***
 
 Place your HTML fragments that you might on use on multiple page (e.g. footer) into the `_includes` directory. To include it use `_includes/sample.html` in your HTML. A Grunt task with auto-recompile all the HTML files.
 
